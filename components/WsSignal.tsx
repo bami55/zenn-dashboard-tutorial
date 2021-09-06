@@ -16,10 +16,6 @@ const WsSignal = (): JSX.Element => {
 
   const socketUrl = 'ws://localhost:49122';
   const {
-    sendMessage,
-    sendJsonMessage,
-    lastMessage,
-    lastJsonMessage,
     readyState
   } = useWebSocket(socketUrl, {
     onOpen: () => console.log('opened'),
