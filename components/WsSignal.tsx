@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 import { WsEvent } from '../interface/WsEvent'
 
@@ -7,35 +8,39 @@ const preStyle = {
   color: '#eee',
   height: '300px',
   width: '500px',
-  overflowY: 'auto',
+  overflow: 'auto',
 }
 
 const WsSignal = (): JSX.Element => {
-  const [connected, setConnected] = useState(false)
   const [messages, setMessages] = useState([] as Array<WsEvent>)
 
-  const ws = new WebSocket('ws://localhost:42321')
+  const socketUrl = 'ws://localhost:49122';
+  const {
+    sendMessage,
+    sendJsonMessage,
+    lastMessage,
+    lastJsonMessage,
+    readyState
+  } = useWebSocket(socketUrl, {
+    onOpen: () => console.log('opened'),
+    onMessage: (e) => {
+      const message: WsEvent = e.data
+      setMessages(messages.concat(message))
+    },
+    shouldReconnect: () => true,
+  });
 
-  ws.onopen = () => {
-    setConnected(true)
-  }
-
-  ws.onmessage = (e) => {
-    const message: WsEvent = e.data
-    setMessages(messages.concat(message))
-  }
-
-  ws.onclose = () => {
-    setConnected(false)
-  }
-
-  ws.onerror = (e) => {
-    console.error(e)
-  }
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: '接続中',
+    [ReadyState.OPEN]: '接続完了',
+    [ReadyState.CLOSING]: '切断中',
+    [ReadyState.CLOSED]: '切断完了',
+    [ReadyState.UNINSTANTIATED]: '動作停止',
+  }[readyState];
 
   return (
     <div>
-      <h1>{connected ? '接続' : '切断'}</h1>
+      <h1>{connectionStatus}</h1>
       <pre style={preStyle}>{messages.join('\n')}</pre>
     </div>
   )
