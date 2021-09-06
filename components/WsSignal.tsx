@@ -14,7 +14,7 @@ const preStyle = {
 const WsSignal = (): JSX.Element => {
   const [messages, setMessages] = useState([] as Array<WsEvent>)
 
-  const socketUrl = 'ws://localhost:49122';
+  const socketUrl = 'ws://localhost:49322';
   const {
     readyState
   } = useWebSocket(socketUrl, {
